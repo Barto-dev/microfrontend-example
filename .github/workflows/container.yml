@@ -4,24 +4,20 @@ on:
   push:
     branches:
       - master
-    # When something changes in this folder in all files
     paths:
       - 'packages/container/**'
 
-
 defaults:
   run:
-    # where run actions
-    working-directory: 'packages/container'
+    working-directory: packages/container
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      # move cod from github folder to virtual machine
       - uses: actions/checkout@v2
       - run: npm install
-      # create dist folder in virtual machine
       - run: npm run build
 
       - uses: chrislennon/action-aws-cli@v1.1
