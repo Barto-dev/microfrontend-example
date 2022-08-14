@@ -5,10 +5,12 @@ on:
     branches:
       - master
     paths:
+      # When something changes in this folder in all files
       - 'packages/container/**'
 
 defaults:
   run:
+    # where run actions
     working-directory: packages/container
 
 jobs:
@@ -16,8 +18,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # move cod from github folder to virtual machine
       - uses: actions/checkout@v2
       - run: npm install
+      # create dist folder in virtual machine
       - run: npm run build
 
       - name: Configure AWS Credentials
