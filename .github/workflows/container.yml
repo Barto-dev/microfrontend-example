@@ -1,0 +1,31 @@
+name: deploy-container
+
+on:
+  push:
+    branches:
+      - master
+    # When something changes in this folder in all files
+    paths:
+      - 'packages/container/**'
+
+
+defaults:
+  run:
+    # where run actions
+    working-directory: 'packages/container'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # move cod from github folder to virtual machine
+      - uses: actions/checkout@v2
+      - run: npm install
+      # create dist folder in virtual machine
+      - run: npm run build
+
+      - uses: chrislennon/action-aws-cli@v1.1
+      - run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/container/latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
