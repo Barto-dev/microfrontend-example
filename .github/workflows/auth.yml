@@ -1,0 +1,36 @@
+name: deploy-auth
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      # When something changes in this folder in all files
+      - 'packages/auth/**'
+
+defaults:
+  run:
+    # where run actions
+    working-directory: packages/auth
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # move cod from github folder to virtual machine
+      - uses: actions/checkout@v2
+      - run: npm install
+      # create dist folder in virtual machine
+      - run: npm run build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+
+      - name: Copy files to the s3 website content bucket
+        run:
+          aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/auth/latest
